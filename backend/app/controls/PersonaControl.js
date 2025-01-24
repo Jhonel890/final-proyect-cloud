@@ -1,7 +1,9 @@
 'use strict';
 
-const models = require('../models');
-const {persona, rol, cuenta, sequelize } = models;
+const persona = require('../models/persona');
+const cuenta = require('../models/cuenta');
+const rol = require('../models/rol');
+const sequelize = require('../../db');
 const uuid = require('uuid');
 
 class PersonaControl {

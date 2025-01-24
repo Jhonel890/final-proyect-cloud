@@ -12,7 +12,7 @@ const db = {};
 const sequelize = new Sequelize('tiempo', 'jhone', 'Sanduche333!', {
     host: '127.0.0.1',
     dialect: 'mysql',
-    port: 3306,
+    port: 3307,
     charset: 'utf8'
 });
 
@@ -47,7 +47,7 @@ Object.keys(db).forEach(modelName => {
 });
 
 // Sincronizar los modelos con la base de datos
-sequelize.sync({ alter: true })
+sequelize.sync({ alter: false })
   .then(() => {
     console.log('Modelos sincronizados con la base de datos.');
   })

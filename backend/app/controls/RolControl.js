@@ -1,7 +1,6 @@
 'use strict';
 
-const models = require('../models');
-const Rol = models.rol;
+const Rol = require('../models/rol');
 
 class RolControl {
     async listar(req, res) {

@@ -3,9 +3,9 @@
     "username": "jhone",
     "password": "Sanduche333!",
     "database": "tiempo",
-    "host": "127.0.0.1",
+    "host": "localhost",
     "dialect": "mysql",
-    "port": 3001,
+    "port": "3307",
     "charset": "utf8"
     }
 

@@ -1,7 +1,5 @@
 'use strict';
-
-const models = require('../models');
-const Cuenta = models.cuenta;
+const Cuenta = require('../models/cuenta');
 const jwt = require('jsonwebtoken');
 
 class CuentaControl {
