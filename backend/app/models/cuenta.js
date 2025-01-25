@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
         clave: { type: DataTypes.STRING(100),allowNull:false},
         estado: {type:DataTypes.BOOLEAN,defaultValue:true},
         external_id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 }
-    }, { freezeTableName: true });
+    }, { freezeTableName: true, timestamps: true });
     cuenta.associate=function(models){
         cuenta.belongsTo(models.persona,{
             foreignKey:'id_persona'});

@@ -1,11 +1,10 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Inquietud = sequelize.define(
-    "inquietud",
+  const Respuesta = sequelize.define(
+    "respuesta",
     {
-      titulo: { type: DataTypes.STRING(150), allowNull: false },
-      descripcion: { type: DataTypes.STRING(500), allowNull: true },
+      descripcion: { type: DataTypes.STRING(500), allowNull: false },
       imagen: { type: DataTypes.STRING(500), allowNull: true },
       video: { type: DataTypes.STRING(500), allowNull: true },
       external_id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 },
@@ -17,17 +16,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Inquietud.associate = function (models) {
-    Inquietud.belongsTo(models.persona, {
-      foreignKey: "id_persona",
-      as: "persona",
-    });
-
-    Inquietud.hasMany(models.respuesta, {
+  Respuesta.associate = function (models) {
+    Respuesta.belongsTo(models.inquietud, {
       foreignKey: "id_inquietud",
-      as: "respuestas",
+      as: "inquietud",
     });
   };
 
-  return Inquietud;
+  return Respuesta;
 };

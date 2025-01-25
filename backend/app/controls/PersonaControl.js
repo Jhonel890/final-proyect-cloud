@@ -1,7 +1,7 @@
 'use strict';
 
 const { persona, cuenta, rol, sequelize } = require('../models');
-
+const {personaSchema} = require('../schemas/schemas');
 const uuid = require('uuid');
 
 class PersonaControl {
@@ -16,7 +16,7 @@ class PersonaControl {
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
             });
 
             if (!lista) {
@@ -39,7 +39,7 @@ class PersonaControl {
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
             });
 
             res.status(200);
@@ -51,11 +51,15 @@ class PersonaControl {
     }
 
     async guardar(req, res) {
-        const { nombres, apellidos, direccion, cedula, correo, clave, rol: rolId } = req.body;
+        const safeBody = personaSchema.safeParse(req.body);
 
-        if (nombres && apellidos && direccion && cedula && correo && clave && rolId) {
+        if (safeBody.error) {
+            res.status(400);
+            return res.json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
+            
+        } else {
             try {
-                const rolA = await rol.findOne({ where: { external_id: rolId } });
+                const rolA = await rol.findOne({ where: { external_id: safeBody.data.rol} });
 
                 if (!rolA) {
                     res.status(400);
@@ -63,16 +67,17 @@ class PersonaControl {
                 }
 
                 const data = {
-                    nombres,
-                    apellidos,
-                    cedula,
-                    direccion,
+                    nombres: req.body.nombres,
+                    apellidos: req.body.apellidos,
+                    cedula: req.body.cedula,
+                    direccion: req.body.direccion,
+                    tipo_perfil: req.body.tipo_perfil,
                     external_id: uuid.v4(),
                     id_rol: rolA.id,
                     cuenta: {
-                        correo: correo,
-                        clave
-                    }
+                        correo: req.body.cuenta.correo,
+                        clave: req.body.cuenta.clave,
+                    },
                 };
 
                 const transaction = await sequelize.transaction();
@@ -98,90 +103,77 @@ class PersonaControl {
                 res.status(500);
                 res.json({ message: "Error interno del servidor", code: 500, error: error.message });
             }
-        } else {
-            res.status(400);
-            res.json({ message: "Error de solicitud", tag: "Datos incorrectos", code: 400 });
-        }
+        } 
     }
 
     async modificar(req, res) {
-        if (
-            req.body.hasOwnProperty('nombres') &&
-            req.body.hasOwnProperty('apellidos') &&
-            req.body.hasOwnProperty('cedula') &&
-            req.body.hasOwnProperty('direccion') &&
-            req.body.hasOwnProperty('correo') &&
-            req.body.hasOwnProperty('clave') &&
-            req.body.hasOwnProperty('rol')
-        ) {
-            const external = req.params.external;
+        const safeBody = personaSchema.safeParse(req.body);
     
+        if (safeBody.error) {
+            res.status(400);
+            return res.json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
+        } else {
             try {
-                const personaA = await persona.findOne({ where: { external_id: external }, include: [{ model: cuenta, as: 'cuenta' }] });
-            
-                if (!personaA) {
-                    res.status(404);
-                    return res.json({ msg: "ERROR", tag: "Registro no encontrado", code: 404 });
-                }
-            
-                const rolA = await rol.findOne({ where: { external_id: req.body.rol } });
-            
+                
+                const rolA = await rol.findOne({ where: { external_id: safeBody.data.rol } });
+    
                 if (!rolA) {
                     res.status(400);
-                    return res.json({ msg: "ERROR", tag: "Rol no existente", code: 400 });
+                    return res.json({ message: "Error de solicitud", tag: "Rol no existente", code: 400 });
                 }
-            
-                const data = {
-                    nombres: req.body.nombres,
-                    apellidos: req.body.apellidos,
-                    cedula: req.body.cedula,
-                    direccion: req.body.direccion,
-                    id_rol: rolA.id,
-                    cuenta: {
-                        correo: req.body.correo,
-                        clave: req.body.clave,
-                    },
-                };
-            
-                const transaction = await models.sequelize.transaction();
-            
+    
+                const transaction = await sequelize.transaction();
+    
                 try {
-                    // Verificar si personaA.cuenta existe antes de intentar actualizar
-                    if (personaA.cuenta) {
-                        await personaA.cuenta.update({
-                            correo: req.body.correo,
-                            clave: req.body.clave,
-                        }, { transaction });
+  
+                    const updatedPersona = await persona.update(
+                        {
+                            nombres: req.body.nombres,
+                            apellidos: req.body.apellidos,
+                            cedula: req.body.cedula,
+                            direccion: req.body.direccion,
+                            tipo_perfil: req.body.tipo_perfil,
+                            id_rol: rolA.id,
+                        },
+                        { where: { external_id: req.params.external }, transaction }
+                    );
+    
+                    if (!updatedPersona[0]) {
+                        await transaction.rollback();
+                        res.status(401);
+                        return res.json({ message: "Error de autenticación", tag: "No se puede modificar", code: 401 });
                     }
-            
-                    await personaA.update(data, {
-                        include: [{ model: models.cuenta, as: "cuenta" }],
+
+                    const cuentaAsociada = await cuenta.findOne({
+                        where: { id_persona: updatedPersona[0] }, 
                         transaction,
                     });
-            
+    
+                    if (cuentaAsociada) {
+                        await cuentaAsociada.update(
+                            {
+                                correo: req.body.cuenta.correo,
+                                clave: req.body.cuenta.clave,
+                            },
+                            { transaction }
+                        );
+                    }
+    
                     await transaction.commit();
-            
+    
                     res.status(200);
-                    res.json({ msg: "OK", code: 200 });
-            
+                    res.json({ message: "Éxito", code: 200 });
                 } catch (error) {
-                    if (transaction) await transaction.rollback();
-            
+                    await transaction.rollback();
                     res.status(203);
-                    res.json({ msg: "ERROR", code: 203, error_msg: error.message });
+                    res.json({ message: "Error de procesamiento", code: 203, error: error.message });
                 }
-            
             } catch (error) {
                 res.status(500);
-                res.json({ msg: "ERROR", code: 500, error_msg: error.message });
+                res.json({ message: "Error interno del servidor", code: 500, error: error.message });
             }
-        } else {
-            res.status(400);
-            res.json({ msg: "ERROR", tag: "Datos incorrectos", code: 400 });
         }
     }
-
-
 }
 
 module.exports = PersonaControl;
