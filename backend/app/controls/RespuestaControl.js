@@ -48,7 +48,7 @@ class RespuestaControl {
             return res.json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
             
         } else {
-            const data = safeBody.data;
+            const data = { ...safeBody.data };
 
             const inquietudA = await inquietud.findOne({
                 where: { external_id: req.body.inquietud },
