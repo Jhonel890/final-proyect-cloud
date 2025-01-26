@@ -1,4 +1,3 @@
-// src/pages/principal.jsx
 import React from 'react';
 
 const Principal = () => {

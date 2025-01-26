@@ -1,15 +1,13 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Principal from './pages/principal'; // Importa la página 'principal'
-
+import Principal from './pages/principal'; 
+import Login from './pages/login/login';
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Define la ruta para la página principal */}
         <Route path="/principal" element={<Principal />} />
-        {/* Puedes agregar otras rutas aquí */}
+        <Route path="/" element={<Login />} />
       </Routes>
     </Router>
   );
