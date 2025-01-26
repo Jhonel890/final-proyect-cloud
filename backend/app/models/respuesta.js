@@ -18,8 +18,13 @@ module.exports = (sequelize, DataTypes) => {
 
   Respuesta.associate = function (models) {
     Respuesta.belongsTo(models.inquietud, {
-      foreignKey: "id_inquietud",
-      as: "inquietud",
+      foreignKey: 'id_inquietud',
+      as: 'inquietud',
+    });
+  
+    Respuesta.belongsTo(models.persona, {
+      foreignKey: 'id_persona',
+      as: 'persona',
     });
   };
 

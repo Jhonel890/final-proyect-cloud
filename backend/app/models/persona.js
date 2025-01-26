@@ -25,15 +25,26 @@ module.exports = (sequelize, DataTypes) => {
     external_id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 },
   }, {
     freezeTableName: true,
-    timestamps: true // Esto asegura que 'createdAt' y 'updatedAt' sean gestionados automáticamente por Sequelize
+    timestamps: true
   });
 
   persona.associate = function (models) {
     persona.hasOne(models.cuenta, {
-      foreignKey: 'id_persona', as: 'cuenta'
+      foreignKey: 'id_persona',
+      as: 'cuenta',
     });
     persona.belongsTo(models.rol, {
-      foreignKey: 'id_rol'
+      foreignKey: 'id_rol',
+    });
+    
+    persona.hasMany(models.inquietud, {
+      foreignKey: 'id_persona',
+      as: 'inquietudes',
+    });
+  
+    persona.hasMany(models.respuesta, {
+      foreignKey: 'id_persona',
+      as: 'respuestas',
     });
   };
 

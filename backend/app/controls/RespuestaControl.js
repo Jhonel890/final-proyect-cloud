@@ -1,6 +1,6 @@
 'use strict';
 
-const { inquietud, respuesta } = require('../models');
+const { inquietud, respuesta, persona } = require('../models');
 const {respuestaSchema} = require('../schemas/schemas');
 const uuid = require('uuid');
 
@@ -10,7 +10,8 @@ class RespuestaControl {
             const lista = await respuesta.findAll({
                 attributes: ['descripcion', 'imagen', 'video', 'estado', 'external_id'],
                 include: [
-                    { model: inquietud, as: 'inquietud', attributes: ['titulo', "descripcion"] }
+                    { model: inquietud, as: 'inquietud', attributes: ['titulo', "descripcion"] },
+                    { model: persona, as: 'persona', attributes: ['nombres', 'apellidos', 'external_id'] }
                 ]
             });
             res.status(200).json({ message: "Éxito", code: 200, data: lista });
@@ -27,7 +28,8 @@ class RespuestaControl {
                 },
                 attributes: ['descripcion', 'imagen', 'video', 'estado', 'external_id'],
                 include: [
-                    { model: inquietud, as: 'inquietud', attributes: ['titulo', "descripcion"] }
+                    { model: inquietud, as: 'inquietud', attributes: ['titulo', "descripcion"] },
+                    { model: persona, as: 'persona', attributes: ['nombres', 'apellidos', 'external_id'] }
                 ]
             });
             if (!result) {
@@ -58,13 +60,24 @@ class RespuestaControl {
                 res.status(404).json({ message: "ERROR", tag: "Inquietud no encontrada", code: 404 });
             }
 
+            const personaA = await persona.findOne({
+                where: { external_id: req.body.persona },
+            });
+
+            if (!personaA) {
+                res.status(404).json({ message: "ERROR", tag: "Persona no encontrada", code: 404 });
+            }
+
+            data.id_persona = personaA.id;
+            
+
             data.id_inquietud = inquietudA.id;
             
             const result = await respuesta.create(data);
             if (!result) {
                 res.status(401).json({ message: "ERROR", tag: "No se puede crear", code: 401 });
             } else {
-                res.status(201).json({ message: "EXITO", code: 201, data: result });
+                res.status(201).json({ message: "EXITO", code: 201});
             }
         }
     }
@@ -75,6 +88,17 @@ class RespuestaControl {
             res.status(400).json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
         } else {
             const data = safeBody.data;
+
+            const personaA = await persona.findOne({
+                where: { external_id: req.body.persona },
+            });
+
+            if (!personaA) {
+                res.status(404).json({ message: "ERROR", tag: "Persona no encontrada", code: 404 });
+            }
+
+            data.id_persona = personaA.id;
+
             const result = await respuesta.update(data, {
                 where: {
                     external_id: req.params.external

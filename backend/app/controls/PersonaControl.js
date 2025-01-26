@@ -66,6 +66,13 @@ class PersonaControl {
                     return res.json({ message: "Error de solicitud", tag: "Rol no existente", code: 400 });
                 }
 
+                const cuentaA = await cuenta.findOne({ where: { correo: req.body.cuenta.correo } });
+
+                if (cuentaA) {
+                    res.status(400);
+                    return res.json({ message: "Error de solicitud", tag: "Correo ya existente", code: 400 });
+                }
+
                 const data = {
                     nombres: req.body.nombres,
                     apellidos: req.body.apellidos,
@@ -120,6 +127,13 @@ class PersonaControl {
                 if (!rolA) {
                     res.status(400);
                     return res.json({ message: "Error de solicitud", tag: "Rol no existente", code: 400 });
+                }
+
+                const cuentaA = await cuenta.findOne({ where: { correo: req.body.cuenta.correo } });
+
+                if (cuentaA) {
+                    res.status(400);
+                    return res.json({ message: "Error de solicitud", tag: "Correo ya existente", code: 400 });
                 }
     
                 const transaction = await sequelize.transaction();
