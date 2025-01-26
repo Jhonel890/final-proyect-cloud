@@ -7,45 +7,45 @@ const cors = require('cors');
 const routerCuenta = require('./routes/cuenta');
 const routerPersona = require('./routes/persona');
 const routerRol = require('./routes/rol');
-
+const routerInquietud = require('./routes/inquietud');
+const routerRespuesta = require('./routes/respuesta');
 var app = express();
 app.use(cors({ origin: '*' })); 
 
-
-app.use('/cuenta', routerCuenta);
-app.use('/persona', routerPersona);
-app.use('/rol', routerRol);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.use(express.json());
 
 app.use(logger('dev'));
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use('/cuenta', routerCuenta);
+app.use('/persona', routerPersona);
+app.use('/rol', routerRol);
+app.use('/inquietud', routerInquietud);
+app.use('/respuesta', routerRespuesta);
 
 console.log("Ruta de modelos:", path.resolve(__dirname, 'app', 'models'));
 let models = require('./app/models');
-models.sequelize.sync({ force:false, logging: false }).then(() => { //drop
+models.sequelize.sync({ force: false, logging: false }).then(() => {
   console.log("Se ha sincronizado la base de datos");
 }).catch(err => {
   console.log(err, 'Hubo un error al sincronizar la base de datos');
 });
 
+// Middleware para manejar errores 404
 app.use(function(req, res, next) {
-  next(createError(404));
+  res.status(404).json({
+    message: 'No se encontró la ruta solicitada',
+    error: 'Not Found',
+  });
 });
 
-// error handler
+// Middleware para manejar otros errores
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(err.status || 500).json({
+    message: err.message || 'Error interno del servidor',
+    error: process.env.NODE_ENV === 'development' ? err : {}, // Solo en modo desarrollo
+  });
 });
 
 module.exports = app;
