@@ -24,7 +24,8 @@ class CuentaControl {
                 let cuentaPersona = await Cuenta.findOne({
                     where: { correo: req.body.correo },
                     include: [
-                        {model: models.persona,as: 'persona',attributes:['external_id',"apellidos","nombres"],include: [{model: models.rol, as: 'rol', attributes: ['nombre'],},],},
+                        {model: models.persona,as: 'persona',attributes:['external_id',"apellidos","nombres"],
+                            include: [{model: models.rol, as: 'rol', attributes: ['nombre'],},],},
                     ],
                 });
 
@@ -39,9 +40,7 @@ class CuentaControl {
                             };
                             require('dotenv').config();
                             const key = process.env.KEY_SEC;
-                            const token = jwt.sign(token_data, key, {
-                                expiresIn: '2h'
-                            });
+                            const token = jwt.sign(token_data, key);
                             const info = {
                                 usuario:cuentaPersona.persona.apellidos,
                                 token: token,
