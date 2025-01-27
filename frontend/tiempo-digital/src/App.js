@@ -4,6 +4,11 @@ import Dashboard from './pages/dashboard/dashboard';
 import Login from './pages/login/login';
 import NotFound from './pages/notfound';
 import Register from './pages/register/register';
+import TareasPendientes from './pages/tareasPendientes/tareasPendientes';
+import MisSoluciones from './pages/misSoluciones/misSoluciones';
+import MisCoins from './pages/misCoins/misCoins';
+import CrearPregunta from './pages/crearPregunta/crearPregunta';
+import Perfil from './pages/perfil/perfil';
 const App = () => {
   return (
     <Router>
@@ -12,6 +17,14 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/tareasPendientes" element={< TareasPendientes/>} />
+        <Route path="/misSoluciones" element={< MisSoluciones/>} />
+        <Route path="/misCoins" element={< MisCoins/>} />
+        <Route path="/crearPregunta" element={< CrearPregunta/>} />
+        <Route path="/perfil" element={< Perfil/>} />
+
+
+
       </Routes>
     </Router>
   );
