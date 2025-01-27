@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GET, POST } from "../utils/methods";
 import { getExternalID, getToken } from "../utils/auth";
+import { Alerta } from "../utils/mensajes";
 
 const useProfileCompletion = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,17 +27,16 @@ const useProfileCompletion = () => {
     try {
       const idPersona = getExternalID();
       const response = await POST(`/persona/status/change/${idPersona}`, profileData, getToken());
-      console.log(response);
       if (response.code === 200) {
         setShowModal(false);
-        alert({
+        Alerta({
             title: "Perfil completado",
             text: "Tu perfil ha sido completado exitosamente",
             icon: "success",
             confirmButtonText: "Aceptar",
         });
       } else {
-        alert({
+        Alerta({
             title: "Error",
             text: response.tag,
             icon: "error",
@@ -45,7 +45,7 @@ const useProfileCompletion = () => {
       }
     } catch (error) {
       console.error("Error enviando datos del perfil:", error);
-      alert({
+      Alerta({
             title: "Error",
             text: "Ocurrió un error al enviar los datos del perfil",
             icon: "error",
