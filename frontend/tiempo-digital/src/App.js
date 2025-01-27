@@ -9,6 +9,8 @@ import MisSoluciones from './pages/misSoluciones/misSoluciones';
 import MisCoins from './pages/misCoins/misCoins';
 import CrearPregunta from './pages/crearPregunta/crearPregunta';
 import Perfil from './pages/perfil/perfil';
+import ResponderPregunta from './pages/responderPregunta/responderPregunta';
+import MasDetalles from './pages/masDetalles/masDetalles';
 const App = () => {
   return (
     <Router>
@@ -22,6 +24,8 @@ const App = () => {
         <Route path="/misCoins" element={< MisCoins/>} />
         <Route path="/crearPregunta" element={< CrearPregunta/>} />
         <Route path="/perfil" element={< Perfil/>} />
+        <Route path="/responderPregunta" element={< ResponderPregunta/>} />
+        <Route path="/masDetalles" element={< MasDetalles/>} />
 
 
 

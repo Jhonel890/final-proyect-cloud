@@ -49,8 +49,8 @@ const PreguntasPage = () => {
                 <h2 style={styles.cardTitle}>{pregunta.titulo}</h2>
                 <p style={styles.cardDescription}>{pregunta.descripcion}</p>
                 <div style={styles.buttonContainer}>
-                  <button style={styles.outlineButton}>Más detalles</button>
-                  <button style={styles.primaryButton}>Responder</button>
+                  <Link to="/masDetalles" style={{ ...styles.outlineButton, textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Mas detalles</Link>
+                  <Link to="/responderPregunta" style={{ ...styles.primaryButton, textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Responder</Link>
                 </div>
               </div>
             </div>
