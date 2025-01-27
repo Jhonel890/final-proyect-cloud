@@ -1,21 +1,42 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { postRespuestas } from "../../hooks/usePostRespuestas";
+import { useGetPregunta } from "../../hooks/useGetPreguntas";
+import { Alerta } from "../../utils/mensajes";
 
 const Responder = () => {
   const [respuesta, setRespuesta] = useState("");
   const navigate = useNavigate();
+  const {external_id: inquietud} = useParams();
 
-  const pregunta = {
-    titulo: "¿Alguien puede ayudarme a reparar mi teléfono?",
-    descripcion:
-      "Mi celular no enciende y necesito a alguien que pueda revisarlo. ¿Hay algún técnico disponible?",
-  };
+  // const pregunta = {
+  //   titulo: "¿Alguien puede ayudarme a reparar mi teléfono?",
+  //   descripcion:
+  //     "Mi celular no enciende y necesito a alguien que pueda revisarlo. ¿Hay algún técnico disponible?",
+  // };
 
-  const handleSubmit = (e) => {
+  const pregunta = useGetPregunta(inquietud)
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes manejar el envío de la respuesta, por ejemplo, guardándola o enviándola a un servidor
-    console.log("Respuesta enviada:", respuesta);
-    navigate('/principal'); // Redirige al dashboard principal después de enviar la respuesta
+    
+    const response = await postRespuestas({descripcion:respuesta, inquietud});
+    if (response.code === 201){
+      Alerta({
+        title: "Comentario agregado",
+        text: "Todo correcto",
+        confirmButtonText: "Aceptar",
+        icon: "success"
+      })
+      navigate('/principal');
+    }else{
+      Alerta({
+        title: "Error",
+        text: "Ups! algo salio mal",
+        confirmButtonText: "Aceptar",
+        icon: "error"
+      })
+    }
   };
 
   return (

@@ -1,48 +1,63 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useGetUser from "../../hooks/useGetUser";
+import MostrarPerfiles from "../components/mostrarPerfiles";
+import EditarPerfiles from "../components/editarPerfiles/editarPerfiles";
+
 
 const Perfil = () => {
   const navigate = useNavigate();
-
-  const usuario = {
-    nombre: "Juan Pérez",
-    correo: "juan.perez@ejemplo.com",
-    telefono: "+123 456 789",
-    ubicacion: "Montevideo, Uruguay",
-    fotoPerfil: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png", // Foto de ejemplo
-  };
+  const user = useGetUser();
 
   return (
     <div style={styles.pageContainer}>
       {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.sectionTitle}>Mi Perfil</h1>
-        <button style={styles.backButton} onClick={() => navigate('/principal')}>
+        <button style={styles.backButton} onClick={() => navigate("/principal")}>
           Volver a Principal
         </button>
       </div>
 
       {/* Información del Perfil */}
-      <div style={styles.profileContainer}>
-        <div style={styles.profileHeader}>
-          <img src={usuario.fotoPerfil} alt="Foto de perfil" style={styles.profileImage} />
-          <div>
-            <h2 style={styles.profileName}>{usuario.nombre}</h2>
-            <p style={styles.profileEmail}>{usuario.correo}</p>
+      {user ? (
+        <div style={styles.profileContainer}>
+          <div style={styles.profileHeader}>
+            <img
+              src={user.fotoPerfil || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"}
+              alt="Foto de perfil"
+              style={styles.profileImage}
+            />
+            <div>
+              <h2 style={styles.profileName}>
+                {user.nombres} {user.apellidos}
+              </h2>
+              <p style={styles.profileEmail}>{user.cedula}</p>
+            </div>
           </div>
-        </div>
 
-        <div style={styles.profileDetails}>
-          <p><strong>Teléfono:</strong> {usuario.telefono}</p>
-          <p><strong>Ubicación:</strong> {usuario.ubicacion}</p>
-        </div>
+          <div style={styles.profileDetails}>
+            <p>
+              <strong>Dirección:</strong> {user.direccion || "No especificada"}
+            </p>
+            <p>
+              <strong>Monedas:</strong> {user.monedas?.toFixed(2)}
+            </p>
+            <p>
+              <strong>Descripción:</strong> {user.descripcion || "No especificada"}
+            </p>
+          </div>
 
-        <div style={styles.buttonContainer}>
-          <button style={styles.primaryButton} onClick={() => navigate('/editar-perfil')}>
-            Editar Perfil
-          </button>
+          <MostrarPerfiles perfiles={user.perfiles} />
+
+          <EditarPerfiles
+            externalId={user.external_id}
+            perfilesActuales={user.perfiles}
+          />
         </div>
-      </div>
+      ) : (
+        <p style={styles.loadingText}>Cargando información del perfil...</p>
+      )}
     </div>
   );
 };
@@ -74,9 +89,6 @@ const styles = {
     color: "white",
     cursor: "pointer",
     transition: "background-color 0.3s",
-    ':hover': {
-      backgroundColor: "#1e40af",
-    },
   },
   profileContainer: {
     display: "flex",
@@ -123,9 +135,11 @@ const styles = {
     color: "white",
     cursor: "pointer",
     transition: "background-color 0.3s",
-    ':hover': {
-      backgroundColor: "#1e40af",
-    },
+  },
+  loadingText: {
+    textAlign: "center",
+    fontSize: "1rem",
+    color: "#6b7280",
   },
 };
 

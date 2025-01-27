@@ -8,6 +8,7 @@ router.get('/', respuestaControl.listar);
 router.get('/:external', respuestaControl.obtener);
 router.post('/', respuestaControl.guardar);
 router.put('/:external', respuestaControl.modificar);
+router.get('/misRespuestas/:persona', respuestaControl.mis_respuestas);
 
 
 module.exports = router;

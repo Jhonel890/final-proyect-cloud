@@ -112,6 +112,32 @@ class RespuestaControl {
             }
         }
     }
+
+    async mis_respuestas(req, res) {
+        try {
+            const id_persona = req.params.persona;
+
+            const personaA = await persona.findOne({
+                where: { external_id: id_persona },
+            });
+
+            if (!personaA) {
+                res.status(404).json({ message: "ERROR", tag: "Persona no encontrada", code: 404 });
+            }
+
+            const lista = await respuesta.findAll({
+                where: { id_persona: personaA.id },
+                attributes: ['descripcion', 'imagen', 'video', 'estado', 'external_id'],
+                include: [
+                    { model: inquietud, as: 'inquietud', attributes: ['titulo', "descripcion"] },
+                    { model: persona, as: 'persona', attributes: ['nombres', 'apellidos', 'external_id'] }
+                ]
+            });
+            res.status(200).json({ message: "Éxito", code: 200, data: lista });
+        } catch (error) {
+            res.status(500).json({ message: "Error interno del servidor", code: 500, error: error.message });
+        }
+    }
 }
 
 module.exports = RespuestaControl;

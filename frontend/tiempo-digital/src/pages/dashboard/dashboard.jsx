@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import CompleteProfileModal from "../components/modalPerfil/modalPerfil";
 import useProfileCompletion from "../../hooks/useProfileCompletion";
 import "./styles.css";
 import useGetPreguntas from "../../hooks/useGetPreguntas";
+import useGetMisCoins from "../../hooks/useGetMisCoins";
 const PreguntasPage = () => {
-  const { showModal, setShowModal, handleProfileSubmit } = useProfileCompletion();
-  const preguntas = useGetPreguntas();
+  const [refetchTrigger, setRefetchTrigger] = useState(false);
+  const preguntas = useGetPreguntas(refetchTrigger) || [];
+  const { showModal, setShowModal, handleProfileSubmit } = useProfileCompletion(() => {
+    setRefetchTrigger((prev) => !prev);
+  });
+
+  const monedas = useGetMisCoins() || 0;
 
   return (
     <div style={styles.pageContainer}>
@@ -34,7 +40,7 @@ const PreguntasPage = () => {
             style={styles.input}
           />
           <div style={styles.profileContainer}>
-            <span style={styles.notificationBadge}>11</span>
+            <span style={styles.notificationBadge}>{monedas}</span>
             <img
               src="https://img.freepik.com/vector-premium/dibujo-dibujos-animados-pila-monedas-oro-signo-dolar-el_761413-4292.jpg"
               alt="Monedas"

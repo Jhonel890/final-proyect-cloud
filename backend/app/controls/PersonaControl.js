@@ -187,6 +187,57 @@ class PersonaControl {
         }
     }
 
+    async cambiarPerfiles(req, res) {
+        const external = req.params.external;
+        
+
+        try {
+            const personaA = await persona.findOne({
+                where: { external_id: external },
+                include: [
+                    { model: perfil, as: 'perfiles' },
+                ],
+            });
+
+            if (!personaA) {
+                res.status(404);
+                return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+            }
+
+            const transaction = await sequelize.transaction();
+    
+            try {
+                const perfiles = await perfil.findAll({
+                    where: {
+                        external_id: req.body.perfiles
+                    },
+                    transaction,
+                });
+
+                if (perfiles.length === 0) {
+                    await transaction.rollback();
+                    res.status(404);
+                    return res.json({ message: "No se encontraron perfiles válidos.", code: 404, data: {} });
+                }
+    
+                // Usa setPerfiles para asociar los perfiles a la persona
+                await personaA.setPerfiles(perfiles, { transaction });
+    
+                await transaction.commit();
+                res.status(200);
+                res.json({ message: "Éxito", code: 200 });
+            } catch (error) {
+                await transaction.rollback();
+                res.status(203);
+                res.json({ message: "Error de procesamiento", code: 203, error: error.message });
+            }
+        }
+        catch (error) {
+            res.status(500);
+            res.json({ message: "Error interno del servidor", code: 500, error: error.message });
+        }
+    }
+
     async isPerfilCompleto(req, res) {
         const external = req.params.external;
 
@@ -254,9 +305,6 @@ class PersonaControl {
                     transaction,
                 });
 
-                //console.log(perfiles);
-                console.log(Object.keys(personaA));
-
                 if (perfiles.length === 0) {
                     await transaction.rollback();
                     res.status(404);
@@ -282,6 +330,28 @@ class PersonaControl {
                 res.status(203);
                 res.json({ message: "Error de procesamiento", code: 203, error: error.message });
             }
+        } catch (error) {
+            res.status(500);
+            res.json({ message: "Error interno del servidor", code: 500, error: error.message });
+        }
+    }
+
+    async misCoins(req, res) {
+        const external = req.params.external;
+
+        try {
+            const personaA = await persona.findOne({
+                where: { external_id: external },
+                attributes: ['monedas'],  
+            });
+
+            if (!personaA) {
+                res.status(404);
+                return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+            }
+
+            res.status(200);
+            res.json({ message: "Éxito", code: 200, monedas: personaA.monedas });
         } catch (error) {
             res.status(500);
             res.json({ message: "Error interno del servidor", code: 500, error: error.message });

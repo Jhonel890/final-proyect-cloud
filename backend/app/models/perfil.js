@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const perfil = sequelize.define(
+  const Perfil = sequelize.define(
     "perfil",
     {
       nombre: {
@@ -20,13 +20,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  perfil.associate = function (models) {
-    perfil.belongsToMany(models.persona, {
+  Perfil.associate = function (models) {
+    Perfil.belongsToMany(models.persona, {
       through: "persona_perfil",
       foreignKey: "id_perfil",
       as: "personas",
     });
+
+    Perfil.belongsToMany(models.inquietud, {
+      through: "inquietud_perfil",
+      foreignKey: "id_perfil",
+      as: "inquietudes",
+    });
   };
 
-  return perfil;
+  return Perfil;
 };

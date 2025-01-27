@@ -1,9 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useGetMisRespuestas from "../../hooks/useGetMisRespuestas";
 
 const Soluciones = () => {
   const navigate = useNavigate();
-
+  const soluciones = useGetMisRespuestas() || [];
   return (
     <div style={styles.pageContainer}>
       {/* Header */}
@@ -19,7 +20,6 @@ const Soluciones = () => {
         {soluciones.map((solucion, index) => (
           <div key={index} style={styles.card}>
             <div style={styles.cardContent}>
-              <h2 style={styles.cardTitle}>{solucion.titulo}</h2>
               <p style={styles.cardDescription}>{solucion.descripcion}</p>
               <div style={styles.buttonContainer}>
                 <button style={styles.outlineButton}>Ver detalles</button>
@@ -32,21 +32,6 @@ const Soluciones = () => {
     </div>
   );
 };
-
-const soluciones = [
-  {
-    titulo: "Conversión de Libras a Dólares",
-    descripcion: "Se resolvió la conversión entre libras esterlinas y dólares estadounidenses.",
-  },
-  {
-    titulo: "Cálculo de Voltaje para Router",
-    descripcion: "Solución a la pregunta sobre cómo alimentar un router de 12V con una batería de 6V.",
-  },
-  {
-    titulo: "Tareas de Redes y Cloud Computing",
-    descripcion: "Se proporcionaron soluciones relacionadas con redes y sistemas de computación en la nube.",
-  },
-];
 
 const styles = {
   pageContainer: {

@@ -3,7 +3,7 @@ import { GET, POST } from "../utils/methods";
 import { getExternalID, getToken } from "../utils/auth";
 import { Alerta } from "../utils/mensajes";
 
-const useProfileCompletion = () => {
+const useProfileCompletion = (onProfileComplete) => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ const useProfileCompletion = () => {
       try {
         const idPersona = getExternalID();
         const response = await GET(`/persona/status/${idPersona}`, getToken());
-        
+
         if (!response.status) {
           setShowModal(true);
         }
@@ -30,26 +30,27 @@ const useProfileCompletion = () => {
       if (response.code === 200) {
         setShowModal(false);
         Alerta({
-            title: "Perfil completado",
-            text: "Tu perfil ha sido completado exitosamente",
-            icon: "success",
-            confirmButtonText: "Aceptar",
+          title: "Perfil completado",
+          text: "Tu perfil ha sido completado exitosamente",
+          icon: "success",
+          confirmButtonText: "Aceptar",
         });
+        if (onProfileComplete) onProfileComplete(); // Notifica el refetch
       } else {
         Alerta({
-            title: "Error",
-            text: response.tag,
-            icon: "error",
-            confirmButtonText: "Aceptar",
+          title: "Error",
+          text: response.tag,
+          icon: "error",
+          confirmButtonText: "Aceptar",
         });
       }
     } catch (error) {
       console.error("Error enviando datos del perfil:", error);
       Alerta({
-            title: "Error",
-            text: "Ocurrió un error al enviar los datos del perfil",
-            icon: "error",
-            confirmButtonText: "Aceptar",
+        title: "Error",
+        text: "Ocurrió un error al enviar los datos del perfil",
+        icon: "error",
+        confirmButtonText: "Aceptar",
       });
     }
   };

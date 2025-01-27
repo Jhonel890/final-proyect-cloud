@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useGetMisCoins from "../../hooks/useGetMisCoins";
 
 const MisMonedas = () => {
   const navigate = useNavigate();
 
+  const monedas = useGetMisCoins() || 0; 
   return (
     <div style={styles.pageContainer}>
       {/* Header */}
@@ -16,27 +18,20 @@ const MisMonedas = () => {
 
       {/* Monedas Section */}
       <div style={styles.gridContainer}>
-        {monedas.map((moneda, index) => (
-          <div key={index} style={styles.card}>
-            <div style={styles.cardContent}>
-              <h2 style={styles.cardTitle}>{moneda.nombre}</h2>
-              <p style={styles.cardDescription}>Cantidad: {moneda.cantidad}</p>
-              <div style={styles.buttonContainer}>
-              </div>
+        <div style={styles.card}>
+          <div style={styles.cardContent}>
+            <p style={styles.cardDescription}>Tienes {monedas} monedas</p>
+            <div style={styles.buttonContainer}>
+              <button style={styles.outlineButton}>Ver detalles</button>
+              <button style={styles.primaryButton}>Comprar más monedas</button>
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
 };
 
-const monedas = [
-  {
-    nombre: "Mis monedas",
-    cantidad: "300",
-  }
-];
 
 const styles = {
   pageContainer: {

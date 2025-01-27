@@ -1,30 +1,47 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useGetPerfiles from "../../hooks/useGetPerfiles";
 import { postPreguntas } from "../../hooks/usePostPreguntas";
 import { Alerta } from "../../utils/mensajes";
 
 const CrearPregunta = () => {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [perfilesSeleccionados, setPerfilesSeleccionados] = useState([]);
   const navigate = useNavigate();
+  const perfiles = useGetPerfiles();
 
-  const handleSubmit = async  (e) => {
+  const handlePerfilChange = (perfilId) => {
+    setPerfilesSeleccionados((prev) =>
+      prev.includes(perfilId)
+        ? prev.filter((external_id) => external_id !== perfilId)
+        : [...prev, perfilId]
+    );
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await postPreguntas({ titulo, descripcion });
+    const response = await postPreguntas({
+      titulo,
+      descripcion,
+      perfiles: perfilesSeleccionados,
+    });
 
-    if (response.code === 200){
+    console.log(response);
+
+    if (response.code === 200) {
       Alerta({
         title: "Pregunta Creada",
         text: "Tu pregunta ha sido creada exitosamente",
         icon: "success",
         confirmButtonText: "Aceptar",
       });
-      navigate('/principal');
-    }else{
+      navigate("/principal");
+    } else {
       Alerta({
         title: "Error",
-        text: response.tag,
+        text: response.message || "Error al crear la pregunta",
         icon: "error",
         confirmButtonText: "Aceptar",
       });
@@ -36,7 +53,7 @@ const CrearPregunta = () => {
       {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.sectionTitle}>Crear Pregunta</h1>
-        <button style={styles.backButton} onClick={() => navigate('/principal')}>
+        <button style={styles.backButton} onClick={() => navigate("/principal")}>
           Volver a Principal
         </button>
       </div>
@@ -44,7 +61,9 @@ const CrearPregunta = () => {
       {/* Formulario de Creación de Pregunta */}
       <form onSubmit={handleSubmit} style={styles.formContainer}>
         <div style={styles.inputGroup}>
-          <label htmlFor="titulo" style={styles.label}>Título de la Pregunta</label>
+          <label htmlFor="titulo" style={styles.label}>
+            Título de la Pregunta
+          </label>
           <input
             type="text"
             id="titulo"
@@ -57,7 +76,9 @@ const CrearPregunta = () => {
         </div>
 
         <div style={styles.inputGroup}>
-          <label htmlFor="descripcion" style={styles.label}>Descripción</label>
+          <label htmlFor="descripcion" style={styles.label}>
+            Descripción
+          </label>
           <textarea
             id="descripcion"
             name="descripcion"
@@ -68,11 +89,33 @@ const CrearPregunta = () => {
           />
         </div>
 
-        <h1 style={styles.sectionTitle}>Se deben poner todos los tags o referencias de tu pregunta ej para cocineros</h1>
-        
+        <h2 style={styles.sectionTitle}>Selecciona Perfiles Relacionados</h2>
+        <div style={styles.perfilesContainer}>
+          {perfiles.length > 0 ? (
+            perfiles.map((perfil) => (
+              <div key={perfil.external_id} style={styles.checkboxGroup}>
+                <input
+                  type="checkbox"
+                  id={`perfil-${perfil.external_id}`}
+                  value={perfil.external_id}
+                  checked={perfilesSeleccionados.includes(perfil.external_id)}
+                  onChange={() => handlePerfilChange(perfil.external_id)}
+                  style={styles.checkbox}
+                />
+                <label htmlFor={`perfil-${perfil.external_id}`} style={styles.checkboxLabel}>
+                  {perfil.nombre}
+                </label>
+              </div>
+            ))
+          ) : (
+            <p>Cargando perfiles...</p>
+          )}
+        </div>
 
         <div style={styles.buttonContainer}>
-          <button type="submit" style={styles.primaryButton}>Crear Pregunta</button>
+          <button type="submit" style={styles.primaryButton}>
+            Crear Pregunta
+          </button>
         </div>
       </form>
     </div>
@@ -152,6 +195,22 @@ const styles = {
     ':hover': {
       backgroundColor: "#1e40af",
     },
+  },
+  perfilesContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    marginBottom: "1rem",
+  },
+  checkboxGroup: {
+    display: "flex",
+    alignItems: "center",
+  },
+  checkbox: {
+    marginRight: "0.5rem",
+  },
+  checkboxLabel: {
+    fontSize: "1rem",
   },
 };
 

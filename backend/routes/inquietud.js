@@ -8,6 +8,7 @@ router.get('/', inquietudControl.listar);
 router.get('/:external', inquietudControl.obtener);
 router.post('/', inquietudControl.guardar);
 router.put('/:external', inquietudControl.modificar);
+router.get('/persona/:external', inquietudControl.inquietudesSegunPerfil);
 
 
 module.exports = router;

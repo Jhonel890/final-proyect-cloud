@@ -22,7 +22,8 @@ const inquietudSchema = zod.object({
     imagen: zod.string().nullable().optional(),
     video: zod.string().nullable().optional(),
     estado: zod.boolean().optional(),
-    persona: zod.string().uuid()
+    persona: zod.string().uuid(),
+    perfiles: zod.array(zod.string().uuid()).optional()
 });
 
 const respuestaSchema = zod.object({
@@ -46,6 +47,7 @@ const completarPerfil = zod.object({
 const perfilSchema = zod.object({
     nombre: zod.string().max(45),
 });
+
 
 module.exports = {
     cuentaSchema,
