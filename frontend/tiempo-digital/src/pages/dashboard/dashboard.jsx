@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import CompleteProfileModal from "../components/modalPerfil/modalPerfil";
 import useProfileCompletion from "../../hooks/useProfileCompletion";
 import "./styles.css";
+import useGetPreguntas from "../../hooks/useGetPreguntas";
 const PreguntasPage = () => {
   const { showModal, setShowModal, handleProfileSubmit } = useProfileCompletion();
+  const preguntas = useGetPreguntas();
 
   return (
     <div style={styles.pageContainer}>
@@ -32,14 +34,14 @@ const PreguntasPage = () => {
             style={styles.input}
           />
           <div style={styles.profileContainer}>
-          <span style={styles.notificationBadge}>11</span>
-          <img
-            src="https://img.freepik.com/vector-premium/dibujo-dibujos-animados-pila-monedas-oro-signo-dolar-el_761413-4292.jpg"
-            alt="Monedas"
-            style={{ width: "60px", height: "60px", borderRadius: "50%" }}
-          />
+            <span style={styles.notificationBadge}>11</span>
+            <img
+              src="https://img.freepik.com/vector-premium/dibujo-dibujos-animados-pila-monedas-oro-signo-dolar-el_761413-4292.jpg"
+              alt="Monedas"
+              style={{ width: "60px", height: "60px", borderRadius: "50%" }}
+            />
             <span style={styles.profileName}><Link to="/perfil" style={{ textDecoration: 'none', color: 'inherit' }}>Juan Pérez</Link></span>
-             
+
             <div style={styles.profileAvatar}>
               <img
                 src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
@@ -59,8 +61,30 @@ const PreguntasPage = () => {
                 <h2 style={styles.cardTitle}>{pregunta.titulo}</h2>
                 <p style={styles.cardDescription}>{pregunta.descripcion}</p>
                 <div style={styles.buttonContainer}>
-                  <Link to="/masDetalles" style={{ ...styles.outlineButton, textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Mas detalles</Link>
-                  <Link to="/responderPregunta" style={{ ...styles.primaryButton, textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Responder</Link>
+                  <Link
+                    to={`/masDetalles/${pregunta.external_id}`}
+                    style={{
+                      ...styles.outlineButton,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    Más detalles
+                  </Link>
+                  <Link
+                    to={`/responderPregunta/${pregunta.external_id}`}
+                    style={{
+                      ...styles.primaryButton,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    Responder
+                  </Link>
                 </div>
               </div>
             </div>
@@ -70,32 +94,15 @@ const PreguntasPage = () => {
           <CompleteProfileModal
             onClose={() => setShowModal(false)}
             onSubmit={handleProfileSubmit}
-          /> )}
+          />)}
         </div>
       </div>
-      
+
     </div>
-    
+
   );
 };
 
-const preguntas = [
-  {
-    titulo: "¿Alguien puede ayudarme a reparar mi teléfono?",
-    descripcion:
-      "Mi celular no enciende y necesito a alguien que pueda revisarlo. ¿Hay algún técnico disponible?",
-  },
-  {
-    titulo: "Mi computadora no enciende, ¿qué puede ser?",
-    descripcion:
-      "Al presionar el botón de encendido, mi PC no responde. ¿Me podrías ayudar a identificar el problema?",
-  },
-  {
-    titulo: "¿Cómo puedo recuperar archivos eliminados?",
-    descripcion:
-      "Borré unos archivos importantes por error. ¿Conoces alguna herramienta o método para recuperarlos?",
-  },
-];
 
 const styles = {
   pageContainer: {

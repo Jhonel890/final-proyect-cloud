@@ -24,8 +24,8 @@ const App = () => {
         <Route path="/misCoins" element={< MisCoins/>} />
         <Route path="/crearPregunta" element={< CrearPregunta/>} />
         <Route path="/perfil" element={< Perfil/>} />
-        <Route path="/responderPregunta" element={< ResponderPregunta/>} />
-        <Route path="/masDetalles" element={< MasDetalles/>} />
+        <Route path="/responderPregunta/:external_id" element={< ResponderPregunta/>} />
+        <Route path="/masDetalles/:external_id" element={< MasDetalles/>} />
 
 
 

@@ -1,16 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { postPreguntas } from "../../hooks/usePostPreguntas";
+import { Alerta } from "../../utils/mensajes";
 
 const CrearPregunta = () => {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async  (e) => {
     e.preventDefault();
-    // Aquí puedes manejar el guardado de la pregunta, por ejemplo, enviándola a un servidor o almacenándola en un estado global
-    console.log("Pregunta Creada:", { titulo, descripcion });
-    navigate('/preguntas'); // Redirigir a la página de preguntas (ajustar la ruta según tu aplicación)
+
+    const response = await postPreguntas({ titulo, descripcion });
+
+    if (response.code === 200){
+      Alerta({
+        title: "Pregunta Creada",
+        text: "Tu pregunta ha sido creada exitosamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+      });
+      navigate('/principal');
+    }else{
+      Alerta({
+        title: "Error",
+        text: response.tag,
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+    }
   };
 
   return (

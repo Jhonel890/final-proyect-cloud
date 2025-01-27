@@ -17,7 +17,6 @@ const CompleteProfileModal = ({ onClose, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(JSON.stringify({ tipo_perfil: selectedProfiles, descripcion: description }));
     onSubmit({ tipo_perfil: selectedProfiles, descripcion: description });
   };
 
