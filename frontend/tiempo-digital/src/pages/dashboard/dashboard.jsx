@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+import CompleteProfileModal from "../components/modalPerfil/modalPerfil";
+import useProfileCompletion from "../../hooks/useProfileCompletion";
+import "./styles.css";
 const PreguntasPage = () => {
+  const { showModal, setShowModal, handleProfileSubmit } = useProfileCompletion();
+
   return (
     <div style={styles.pageContainer}>
       {/* Sidebar */}
@@ -56,8 +60,16 @@ const PreguntasPage = () => {
             </div>
           ))}
         </div>
+        <div>  {showModal && (
+          <CompleteProfileModal
+            onClose={() => setShowModal(false)}
+            onSubmit={handleProfileSubmit}
+          /> )}
+        </div>
       </div>
+      
     </div>
+    
   );
 };
 

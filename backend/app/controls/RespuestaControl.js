@@ -104,6 +104,7 @@ class RespuestaControl {
                     external_id: req.params.external
                 }
             });
+            
             if (!result) {
                 res.status(401).json({ message: "ERROR", tag: "No se puede modificar", code: 401 });
             } else {

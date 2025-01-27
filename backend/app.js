@@ -9,6 +9,7 @@ const routerPersona = require('./routes/persona');
 const routerRol = require('./routes/rol');
 const routerInquietud = require('./routes/inquietud');
 const routerRespuesta = require('./routes/respuesta');
+const routerPerfil = require('./routes/perfil');
 var app = express();
 app.use(cors({ origin: '*' })); 
 
@@ -23,10 +24,11 @@ app.use('/persona', routerPersona);
 app.use('/rol', routerRol);
 app.use('/inquietud', routerInquietud);
 app.use('/respuesta', routerRespuesta);
+app.use('/perfil', routerPerfil);
 
 console.log("Ruta de modelos:", path.resolve(__dirname, 'app', 'models'));
 let models = require('./app/models');
-models.sequelize.sync({ force: true, logging: false }).then(() => {
+models.sequelize.sync({ force: false, logging: false }).then(() => {
   console.log("Se ha sincronizado la base de datos");
 }).catch(err => {
   console.log(err, 'Hubo un error al sincronizar la base de datos');

@@ -1,6 +1,6 @@
 'use strict';
 
-const { persona, cuenta, rol, sequelize } = require('../models');
+const { persona, cuenta, rol, sequelize, perfil } = require('../models');
 const {personaSchema, completarPerfil} = require('../schemas/schemas');
 const uuid = require('uuid');
 
@@ -15,8 +15,9 @@ class PersonaControl {
                 include: [
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
+                    { model: perfil, as: 'perfiles', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil','descripcion', 'monedas', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','descripcion', 'monedas', 'cedula', 'external_id']
             });
 
             if (!lista) {
@@ -38,8 +39,9 @@ class PersonaControl {
                 include: [
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
+                    { model: perfil, as: 'perfiles', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil','descripcion', 'monedas', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','descripcion', 'monedas', 'cedula', 'external_id']
             });
 
             res.status(200);
@@ -59,10 +61,10 @@ class PersonaControl {
             
         } else {
             try {
-                const rolA = await rol.findOne({ where: { nombre : "user"} });
+                let rolA = await rol.findOne({ where: { nombre : "user"} });
 
                 if (!rolA) {
-                    const rolA= await rol.create({ nombre: "user" });
+                    rolA= await rol.create({ nombre: "user" });
                 }
 
                 const cuentaA = await cuenta.findOne({ where: { correo: req.body.cuenta.correo } });
@@ -143,7 +145,6 @@ class PersonaControl {
                             apellidos: req.body.apellidos,
                             cedula: req.body.cedula,
                             direccion: req.body.direccion,
-                            tipo_perfil: req.body.tipo_perfil,
                             id_rol: rolA.id,
                         },
                         { where: { external_id: req.params.external }, transaction }
@@ -196,8 +197,9 @@ class PersonaControl {
                 include: [
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
+                    { model: perfil, as: 'perfiles', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion', 'monedas', 'cedula', 'external_id']
             });
 
             if (!personaA) {
@@ -205,7 +207,7 @@ class PersonaControl {
                 return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
             }
 
-            if (personaA.tipo_perfil === "Default") {
+            if (personaA.perfiles.length === 0) {
                 res.status(200);
                 return res.json({ message: "Perfil incompleto", status: false, code: 200});
             }
@@ -221,47 +223,71 @@ class PersonaControl {
     async completarPerfil(req, res) {
         const external = req.params.external;
         const safeBody = completarPerfil.safeParse(req.body);
-
+    
         if (safeBody.error) {
             res.status(400);
             return res.json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
-        } else {
+        }
+    
+        try {
+            const personaA = await persona.findOne({
+                where: { external_id: external },
+                include: [
+                    { model: cuenta, as: 'cuenta' },
+                    { model: rol, as: 'rol'},
+                    { model: perfil, as: 'perfiles' },
+                ],
+            });
+    
+            if (!personaA) {
+                res.status(404);
+                return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+            }
+
+            const transaction = await sequelize.transaction();
+    
             try {
-                const personaA = await persona.findOne({
-                    where: { external_id: external },
-                    include: [
-                        { model: cuenta, as: 'cuenta', attributes: ['correo'] },
-                        { model: rol, as: 'rol', attributes: ['nombre'] },
-                    ],
-                    attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+                const perfiles = await perfil.findAll({
+                    where: {
+                        external_id: safeBody.data.tipo_perfil
+                    },
+                    transaction,
                 });
 
-                if (!personaA) {
+                //console.log(perfiles);
+                console.log(Object.keys(personaA));
+
+                if (perfiles.length === 0) {
+                    await transaction.rollback();
                     res.status(404);
-                    return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+                    return res.json({ message: "No se encontraron perfiles válidos.", code: 404, data: {} });
                 }
-
-                const updatedPersona = await persona.update(
+    
+                // Usa setPerfiles para asociar los perfiles a la persona
+                await personaA.setPerfiles(perfiles, { transaction });
+    
+                // Actualiza la descripción de la persona
+                await personaA.update(
                     {
-                        tipo_perfil: req.body.tipo_perfil,
-                        descripcion: req.body.descripcion,
+                        descripcion: safeBody.data.descripcion,
                     },
-                    { where: { external_id: external } }
+                    { transaction }
                 );
-
-                if (!updatedPersona[0]) {
-                    res.status(401);
-                    return res.json({ message: "Error de autenticación", tag: "No se puede modificar", code: 401 });
-                }
-
+    
+                await transaction.commit();
                 res.status(200);
                 res.json({ message: "Éxito", code: 200 });
             } catch (error) {
-                res.status(500);
-                res.json({ message: "Error interno del servidor", code: 500, error: error.message });
+                await transaction.rollback();
+                res.status(203);
+                res.json({ message: "Error de procesamiento", code: 203, error: error.message });
             }
+        } catch (error) {
+            res.status(500);
+            res.json({ message: "Error interno del servidor", code: 500, error: error.message });
         }
     }
+    
 }
 
 module.exports = PersonaControl;

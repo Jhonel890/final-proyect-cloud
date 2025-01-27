@@ -1,13 +1,24 @@
 import React, { useState } from "react";
 import "./styles.css";
+import useGetPerfiles from "../../../hooks/useGetPerfiles";
 
 const CompleteProfileModal = ({ onClose, onSubmit }) => {
-  const [occupation, setOccupation] = useState("");
+  const [selectedProfiles, setSelectedProfiles] = useState([]);
   const [description, setDescription] = useState("");
+  const perfiles = useGetPerfiles(); 
+
+  const handleCheckboxChange = (perfil) => {
+    if (selectedProfiles.includes(perfil.external_id)) {
+      setSelectedProfiles(selectedProfiles.filter((id) => id !== perfil.external_id));
+    } else {
+      setSelectedProfiles([...selectedProfiles, perfil.external_id]);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ tipo_perfil: occupation, descripcion: description });
+    console.log(JSON.stringify({ tipo_perfil: selectedProfiles, descripcion: description }));
+    onSubmit({ tipo_perfil: selectedProfiles, descripcion: description });
   };
 
   return (
@@ -15,28 +26,17 @@ const CompleteProfileModal = ({ onClose, onSubmit }) => {
       <div className="modal-content">
         <h1>Crear Perfil</h1>
         <form onSubmit={handleSubmit}>
-          <p>¿Cuáles son tu habilidades u ocupaciones?</p>
-          <div className="radio-group">
-            {[
-              "Profesor",
-              "Cocinero",
-              "Informático",
-              "Médico",
-              "Ingeniero",
-              "Artista",
-              "Abogado",
-              "Arquitecto",
-              "Contador",
-              "Psicólogo",
-            ].map((option) => (
-              <label key={option}>
+          <p>¿Cuáles son tus habilidades u ocupaciones?</p>
+          <div className="checkbox-group">
+            {perfiles.map((perfil) => (
+              <label key={perfil.external_id}>
                 <input
-                  type="radio"
-                  value={option}
-                  checked={occupation === option}
-                  onChange={() => setOccupation(option)}
+                  type="checkbox"
+                  value={perfil.external_id}
+                  checked={selectedProfiles.includes(perfil.external_id)}
+                  onChange={() => handleCheckboxChange(perfil)}
                 />
-                {option}
+                {perfil.nombre.charAt(0).toUpperCase() + perfil.nombre.slice(1)}
               </label>
             ))}
           </div>

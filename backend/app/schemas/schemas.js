@@ -12,18 +12,6 @@ const personaSchema = zod.object({
     direccion: zod.string().max(200).nullable(),
     cedula: zod.string().max(10),
     monedas: zod.number().nullable().optional(),
-    tipo_perfil: zod.enum([
-        "Profesor",
-        "Cocinero",
-        "Informático",
-        "Médico",
-        "Ingeniero",
-        "Artista",
-        "Abogado",
-        "Arquitecto",
-        "Contador",
-        "Psicólogo"
-    ]).optional(),
     cuenta: cuentaSchema,
 });
 
@@ -51,19 +39,12 @@ const rolSchema = zod.object({
 });
 
 const completarPerfil = zod.object({
-    tipo_perfil: zod.enum([
-        "Profesor",
-        "Cocinero",
-        "Informático",
-        "Médico",
-        "Ingeniero",
-        "Artista",
-        "Abogado",
-        "Arquitecto",
-        "Contador",
-        "Psicólogo"
-    ]),
+    tipo_perfil: zod.array(zod.string().uuid().optional()),
     descripcion: zod.string().max(300).nullable().optional()
+});
+
+const perfilSchema = zod.object({
+    nombre: zod.string().max(45),
 });
 
 module.exports = {
@@ -72,5 +53,6 @@ module.exports = {
     inquietudSchema,
     respuestaSchema,
     rolSchema,
-    completarPerfil
+    completarPerfil,
+    perfilSchema
 };
