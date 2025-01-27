@@ -1,7 +1,7 @@
 'use strict';
 
 const { persona, cuenta, rol, sequelize } = require('../models');
-const {personaSchema} = require('../schemas/schemas');
+const {personaSchema, completarPerfil} = require('../schemas/schemas');
 const uuid = require('uuid');
 
 class PersonaControl {
@@ -16,7 +16,7 @@ class PersonaControl {
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil','descripcion', 'monedas', 'cedula', 'external_id']
             });
 
             if (!lista) {
@@ -39,7 +39,7 @@ class PersonaControl {
                     { model: cuenta, as: 'cuenta', attributes: ['correo'] },
                     { model: rol, as: 'rol', attributes: ['nombre'] },
                 ],
-                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil','descripcion', 'monedas', 'cedula', 'external_id']
             });
 
             res.status(200);
@@ -59,11 +59,10 @@ class PersonaControl {
             
         } else {
             try {
-                const rolA = await rol.findOne({ where: { external_id: safeBody.data.rol} });
+                const rolA = await rol.findOne({ where: { nombre : "user"} });
 
                 if (!rolA) {
-                    res.status(400);
-                    return res.json({ message: "Error de solicitud", tag: "Rol no existente", code: 400 });
+                    const rolA= await rol.create({ nombre: "user" });
                 }
 
                 const cuentaA = await cuenta.findOne({ where: { correo: req.body.cuenta.correo } });
@@ -78,7 +77,6 @@ class PersonaControl {
                     apellidos: req.body.apellidos,
                     cedula: req.body.cedula,
                     direccion: req.body.direccion,
-                    tipo_perfil: req.body.tipo_perfil,
                     external_id: uuid.v4(),
                     id_rol: rolA.id,
                     cuenta: {
@@ -122,11 +120,10 @@ class PersonaControl {
         } else {
             try {
                 
-                const rolA = await rol.findOne({ where: { external_id: safeBody.data.rol } });
-    
+                const rolA = await rol.findOne({ where: { nombre : "user"} });
+
                 if (!rolA) {
-                    res.status(400);
-                    return res.json({ message: "Error de solicitud", tag: "Rol no existente", code: 400 });
+                    const rolA= await rol.create({ nombre: "user" });
                 }
 
                 const cuentaA = await cuenta.findOne({ where: { correo: req.body.cuenta.correo } });
@@ -182,6 +179,83 @@ class PersonaControl {
                     res.status(203);
                     res.json({ message: "Error de procesamiento", code: 203, error: error.message });
                 }
+            } catch (error) {
+                res.status(500);
+                res.json({ message: "Error interno del servidor", code: 500, error: error.message });
+            }
+        }
+    }
+
+    async isPerfilCompleto(req, res) {
+        const external = req.params.external;
+
+        try {
+
+            const personaA = await persona.findOne({
+                where: { external_id: external },
+                include: [
+                    { model: cuenta, as: 'cuenta', attributes: ['correo'] },
+                    { model: rol, as: 'rol', attributes: ['nombre'] },
+                ],
+                attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+            });
+
+            if (!personaA) {
+                res.status(404);
+                return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+            }
+
+            if (personaA.tipo_perfil === "Default") {
+                res.status(200);
+                return res.json({ message: "Perfil incompleto", status: false, code: 200});
+            }
+
+            return res.json({ message: "Perfil completo", status: true, code: 200 });
+            
+        } catch (error) {
+            res.status(500);
+            res.json({ message: "Error interno del servidor", code: 500, error: error.message });
+        }
+    }
+
+    async completarPerfil(req, res) {
+        const external = req.params.external;
+        const safeBody = completarPerfil.safeParse(req.body);
+
+        if (safeBody.error) {
+            res.status(400);
+            return res.json({ message: safeBody.error, tag: "Datos incorrectos", code: 400 });
+        } else {
+            try {
+                const personaA = await persona.findOne({
+                    where: { external_id: external },
+                    include: [
+                        { model: cuenta, as: 'cuenta', attributes: ['correo'] },
+                        { model: rol, as: 'rol', attributes: ['nombre'] },
+                    ],
+                    attributes: ['nombres', 'apellidos', 'direccion','tipo_perfil', 'monedas', 'cedula', 'external_id']
+                });
+
+                if (!personaA) {
+                    res.status(404);
+                    return res.json({ message: "Recurso no encontrado", code: 404, data: {} });
+                }
+
+                const updatedPersona = await persona.update(
+                    {
+                        tipo_perfil: req.body.tipo_perfil,
+                        descripcion: req.body.descripcion,
+                    },
+                    { where: { external_id: external } }
+                );
+
+                if (!updatedPersona[0]) {
+                    res.status(401);
+                    return res.json({ message: "Error de autenticación", tag: "No se puede modificar", code: 401 });
+                }
+
+                res.status(200);
+                res.json({ message: "Éxito", code: 200 });
             } catch (error) {
                 res.status(500);
                 res.json({ message: "Error interno del servidor", code: 500, error: error.message });

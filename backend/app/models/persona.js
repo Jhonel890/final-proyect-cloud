@@ -18,10 +18,12 @@ module.exports = (sequelize, DataTypes) => {
         "Abogado",
         "Arquitecto",
         "Contador",
-        "Psicólogo"
+        "Psicólogo",
+        "Default"
       ),
-      allowNull: false,
+      defaultValue: "Default",
     },
+    descripcion: { type: DataTypes.STRING(500), allowNull: true },
     external_id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 },
   }, {
     freezeTableName: true,
