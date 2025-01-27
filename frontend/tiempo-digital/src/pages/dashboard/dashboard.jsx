@@ -28,7 +28,13 @@ const PreguntasPage = () => {
             style={styles.input}
           />
           <div style={styles.profileContainer}>
-            <span style={styles.profileName}>Ángel P</span>
+          <span style={styles.notificationBadge}>11</span>
+          <img
+            src="https://img.freepik.com/vector-premium/dibujo-dibujos-animados-pila-monedas-oro-signo-dolar-el_761413-4292.jpg"
+            alt="Monedas"
+            style={{ width: "60px", height: "60px", borderRadius: "50%" }}
+          />
+            <span style={styles.profileName}><Link to="/perfil" style={{ textDecoration: 'none', color: 'inherit' }}>Juan Pérez</Link></span>
              
             <div style={styles.profileAvatar}>
               <img
@@ -211,6 +217,13 @@ const styles = {
     ':hover': {
       backgroundColor: "#1e40af",
     },
+  },
+  notificationBadge: {
+    marginLeft: '100px',
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: '100%',
+    padding: '2px 5px',
   },
 };
 
