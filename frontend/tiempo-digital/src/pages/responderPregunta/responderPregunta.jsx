@@ -7,58 +7,69 @@ import { Alerta } from "../../utils/mensajes";
 const Responder = () => {
   const [respuesta, setRespuesta] = useState("");
   const navigate = useNavigate();
-  const {external_id: inquietud} = useParams();
+  const { external_id: inquietud } = useParams();
 
-  // const pregunta = {
-  //   titulo: "¿Alguien puede ayudarme a reparar mi teléfono?",
-  //   descripcion:
-  //     "Mi celular no enciende y necesito a alguien que pueda revisarlo. ¿Hay algún técnico disponible?",
-  // };
-
-  const pregunta = useGetPregunta(inquietud)
+  // Obtener la pregunta relacionada con estado de carga
+  const { pregunta, isLoading } = useGetPregunta(inquietud);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const response = await postRespuestas({descripcion:respuesta, inquietud});
-    if (response.code === 201){
-      Alerta({
-        title: "Comentario agregado",
-        text: "Todo correcto",
-        confirmButtonText: "Aceptar",
-        icon: "success"
-      })
-      navigate('/principal');
-    }else{
+    e.preventDefault(); // Agregado para prevenir el comportamiento por defecto del formulario
+
+    try {
+      const response = await postRespuestas({ descripcion: respuesta, inquietud });
+
+      if (response.code === 201) {
+        Alerta({
+          title: "Comentario agregado",
+          text: "Todo correcto",
+          confirmButtonText: "Aceptar",
+          icon: "success",
+        });
+        navigate("/principal");
+      } else {
+        throw new Error("Error en la respuesta del servidor");
+      }
+    } catch (error) {
+      console.error("Error en handleSubmit:", error);
       Alerta({
         title: "Error",
-        text: "Ups! algo salio mal",
+        text: "Ups! algo salió mal",
         confirmButtonText: "Aceptar",
-        icon: "error"
-      })
+        icon: "error",
+      });
     }
   };
 
   return (
     <div style={styles.pageContainer}>
-      {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.sectionTitle}>Responder Pregunta</h1>
-        <button style={styles.backButton} onClick={() => navigate('/principal')}>
+        <button
+          style={styles.backButton}
+          onClick={() => navigate("/principal")}
+        >
           Volver a Principal
         </button>
       </div>
 
-      {/* Pregunta */}
       <div style={styles.questionContainer}>
-        <h2 style={styles.questionTitle}>{pregunta.titulo}</h2>
-        <p style={styles.questionDescription}>{pregunta.descripcion}</p>
+        {isLoading ? (
+          <p style={styles.loadingText}>Cargando pregunta...</p>
+        ) : (
+          <>
+            <h2 style={styles.questionTitle}>{pregunta?.titulo}</h2>
+            <p style={styles.questionDescription}>
+              {pregunta?.descripcion}
+            </p>
+          </>
+        )}
       </div>
 
-      {/* Formulario de Respuesta */}
       <form onSubmit={handleSubmit} style={styles.formContainer}>
         <div style={styles.inputGroup}>
-          <label htmlFor="respuesta" style={styles.label}>Tu Respuesta</label>
+          <label htmlFor="respuesta" style={styles.label}>
+            Tu Respuesta
+          </label>
           <textarea
             id="respuesta"
             name="respuesta"
@@ -70,12 +81,19 @@ const Responder = () => {
         </div>
 
         <div style={styles.buttonContainer}>
-          <button type="submit" style={styles.primaryButton}>Enviar Respuesta</button>
+          <button 
+            type="submit" 
+            style={styles.primaryButton}
+            disabled={isLoading} // Deshabilitar el botón mientras carga
+          >
+            Enviar Respuesta
+          </button>
         </div>
       </form>
     </div>
   );
 };
+
 
 const styles = {
   pageContainer: {
@@ -104,9 +122,6 @@ const styles = {
     color: "white",
     cursor: "pointer",
     transition: "background-color 0.3s",
-    ':hover': {
-      backgroundColor: "#1e40af",
-    },
   },
   questionContainer: {
     backgroundColor: "white",
@@ -157,9 +172,6 @@ const styles = {
     color: "white",
     cursor: "pointer",
     transition: "background-color 0.3s",
-    ':hover': {
-      backgroundColor: "#1e40af",
-    },
   },
 };
 

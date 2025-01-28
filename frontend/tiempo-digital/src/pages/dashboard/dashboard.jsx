@@ -5,6 +5,8 @@ import useProfileCompletion from "../../hooks/useProfileCompletion";
 import "./styles.css";
 import useGetPreguntas from "../../hooks/useGetPreguntas";
 import useGetMisCoins from "../../hooks/useGetMisCoins";
+import useGetUser from "../../hooks/useGetUser";
+
 const PreguntasPage = () => {
   const [refetchTrigger, setRefetchTrigger] = useState(false);
   const preguntas = useGetPreguntas(refetchTrigger) || [];
@@ -13,6 +15,7 @@ const PreguntasPage = () => {
   });
 
   const monedas = useGetMisCoins() || 0;
+  const user = useGetUser() || {};
 
   return (
     <div style={styles.pageContainer}>
@@ -21,8 +24,7 @@ const PreguntasPage = () => {
         <div style={styles.sidebarHeader}>TiempoDigital</div>
         <nav>
           <ul style={styles.navList}>
-            <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/tareasPendientes" style={{ textDecoration: 'none', color: 'inherit' }}>Tareas Pendientes</Link></li>
-            <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/misSoluciones" style={{ textDecoration: 'none', color: 'inherit' }}>Mis Soluciones</Link></li>
+            <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/misSoluciones" style={{ textDecoration: 'none', color: 'inherit' }}>Soluciones a mis preguntas</Link></li>
             <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/misCoins" style={{ textDecoration: 'none', color: 'inherit' }}>Mis Coins</Link></li>
             <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/crearPregunta" style={{ textDecoration: 'none', color: 'inherit' }}>Crear Pregunta</Link></li>
             <li style={{ ...styles.navItem, ...styles.navItemHover }}><Link to="/perfil" style={{ textDecoration: 'none', color: 'inherit' }}>Perfil</Link></li>
@@ -46,8 +48,8 @@ const PreguntasPage = () => {
               alt="Monedas"
               style={{ width: "60px", height: "60px", borderRadius: "50%" }}
             />
-            <span style={styles.profileName}><Link to="/perfil" style={{ textDecoration: 'none', color: 'inherit' }}>Juan Pérez</Link></span>
-
+            
+            <span style={styles.profileName}><Link to="/perfil" style={{ textDecoration: 'none', color: 'inherit' }}>{user.nombres} {user.apellidos}</Link></span>
             <div style={styles.profileAvatar}>
               <img
                 src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"

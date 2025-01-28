@@ -9,17 +9,21 @@ const Soluciones = () => {
     <div style={styles.pageContainer}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.sectionTitle}>Soluciones a Preguntas</h1>
+        <h1 style={styles.sectionTitle}>Soluciones a mis preguntas</h1>
         <button style={styles.backButton} onClick={() => navigate('/principal')}>
           Volver a Principal
-        </button>
+        </button> 
       </div>
+      {/* mostrar en consola mi titulo de la pregunta*/}
+      {console.log(soluciones)}
+
 
       {/* Soluciones Section */}
       <div style={styles.gridContainer}>
         {soluciones.map((solucion, index) => (
           <div key={index} style={styles.card}>
             <div style={styles.cardContent}>
+              <p style={styles.cardTitle}>{solucion.titulo}</p>
               <p style={styles.cardDescription}>{solucion.descripcion}</p>
               <div style={styles.buttonContainer}>
                 <button style={styles.outlineButton}>Ver detalles</button>

@@ -1,6 +1,6 @@
 'use strict';
 
-const { Model } = require('sequelize');
+const { Model, where } = require('sequelize');
 const { persona, inquietud, respuesta, sequelize,perfil } = require('../models');
 const { inquietudSchema } = require('../schemas/schemas');
 const uuid = require('uuid');
@@ -173,6 +173,9 @@ class InquietudControl {
                         attributes: ['descripcion', 'external_id'], // Atributos de la respuesta
                     },
                 ],
+                where: {
+                    estado: true, // Filtrar inquietudes activas
+                },
             });
     
             if (!inquietudes.length) {

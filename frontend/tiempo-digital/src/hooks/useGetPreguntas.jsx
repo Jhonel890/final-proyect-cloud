@@ -23,19 +23,26 @@ export default function useGetPreguntas(refetchTrigger) {
 
 
 export function useGetPregunta(external_id) {
-
-    const [preguntas, setPreguntas] = useState([]);
+    const [pregunta, setPregunta] = useState(null); // Cambié el nombre a pregunta ya que es una sola
+    const [isLoading, setIsLoading] = useState(true);
     
     useEffect(() => {
-        const fetchPerfiles = async () => {
+        const fetchPregunta = async () => {
+            setIsLoading(true);
             try {
                 const response = await GET(`/inquietud/${external_id}`);
-                setPreguntas(response.data);
+                setPregunta(response.data);
             } catch (error) {
-                console.error("Error obteniendo perfiles:", error);
+                console.error("Error obteniendo pregunta:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
-        fetchPerfiles();
-    });
-    return preguntas;
+
+        if (external_id) {
+            fetchPregunta();
+        }
+    }, [external_id]); // Agregamos el array de dependencias
+
+    return { pregunta, isLoading };
 }

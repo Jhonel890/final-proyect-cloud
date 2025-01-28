@@ -28,6 +28,17 @@ const CrearPregunta = () => {
       perfiles: perfilesSeleccionados,
     });
 
+    //si la pregunta no tiene perfiles seleccionados
+    if (perfilesSeleccionados.length === 0) {
+      Alerta({
+        title: "Error",
+        text: "Debes seleccionar al menos un perfil",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+      return;
+    }else{
+
     console.log(response);
 
     if (response.code === 200) {
@@ -46,6 +57,7 @@ const CrearPregunta = () => {
         confirmButtonText: "Aceptar",
       });
     }
+  }
   };
 
   return (
