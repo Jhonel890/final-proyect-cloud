@@ -3,7 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const login = async (correo, clave) => {  
   try {
-    const response = await api.post('/cuenta/auth', { correo, clave });    
+    const response = await api.post('/auth/cuenta/auth', { correo, clave });
+      
     const { token, external_id } = response.data.data;
 
     await AsyncStorage.setItem('userToken', token);
