@@ -63,6 +63,9 @@ class PersonaControl {
             try {
                 let rolA = await rol.findOne({ where: { nombre : "user"} });
 
+                console.log(rolA.dataValues.external_id);
+                
+
                 if (!rolA) {
                     rolA= await rol.create({ nombre: "user" });
                 }
@@ -80,12 +83,14 @@ class PersonaControl {
                     cedula: req.body.cedula,
                     direccion: req.body.direccion,
                     external_id: uuid.v4(),
-                    id_rol: rolA.id,
+                    id_rol: rolA.dataValues.id,
                     cuenta: {
                         correo: req.body.cuenta.correo,
                         clave: req.body.cuenta.clave,
                     },
                 };
+
+                console.log(data);
 
                 const transaction = await sequelize.transaction();
 
@@ -98,6 +103,8 @@ class PersonaControl {
                         res.status(401);
                         return res.json({ message: "Error de autenticación", tag: "No se puede crear", code: 401 });
                     }
+
+                    console.log("creado");
 
                     res.status(200);
                     res.json({ message: "Éxito", code: 200 });

@@ -43,6 +43,8 @@ class RespuestaControl {
     }
 
     async guardar(req, res) {
+        // console.log(req.body);
+        
         try {
             // Validar el cuerpo de la solicitud
             const safeBody = respuestaSchema.safeParse(req.body);
@@ -51,6 +53,8 @@ class RespuestaControl {
             }
     
             const { inquietud: inquietudId, persona: personaId, ...restoDatos } = safeBody.data;
+            console.log(inquietud, persona);
+            
     
             // Buscar la inquietud
             const inquietudA = await inquietud.findOne({ where: { external_id: inquietudId } });
