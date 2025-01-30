@@ -11,7 +11,7 @@ export default function LoginScreen() {
     try {
       const token = await login(correo, clave);
       Alert.alert('Login exitoso');
-      router.push("/InquietudScreen");
+      router.push("/preguntas");
     } catch (error) {
       Alert.alert('Error', 'Credenciales incorrectas');
     }

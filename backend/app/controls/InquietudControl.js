@@ -40,6 +40,8 @@ class InquietudControl {
     }
 
     async guardar(req, res) {
+        console.log(req.body);
+        
         const safeBody = inquietudSchema.safeParse(req.body);
 
         if (safeBody.error) {

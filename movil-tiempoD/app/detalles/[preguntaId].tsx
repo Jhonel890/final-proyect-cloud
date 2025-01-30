@@ -3,10 +3,10 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getPreguntaDetalles } from '../utilities/Preguntas';
 import { useLocalSearchParams } from 'expo-router';
-import RespuestaScreen from '../RespuestaScreen/[preguntaId]';
+import Respuesta from '../respuesta/[preguntaId]';
 import { postRespuesta } from '../utilities/Respuestas';
 
-const DetallesInquietudScreen = ({ params }: any) => {
+const Detalles = ({ params }: any) => {
   const { preguntaId } = useLocalSearchParams<{ preguntaId: string }>();
   const [preguntaDetalles, setPreguntaDetalles] = useState<any>(null);
   const [respuesta, setRespuesta] = useState('');
@@ -27,7 +27,7 @@ const DetallesInquietudScreen = ({ params }: any) => {
 
       if (response.code === 201) {
         Alert.alert("Comentario agregado", "Todo correcto", [
-          { text: "Aceptar", onPress: () => router.push("/InquietudScreen") },
+          { text: "Aceptar", onPress: () => router.push("/preguntas") },
         ]);
       } else {
         throw new Error("Error en la respuesta del servidor");
@@ -42,7 +42,7 @@ const DetallesInquietudScreen = ({ params }: any) => {
     <View style={styles.container}>
       {preguntaDetalles ? (
         <>
-          <RespuestaScreen></RespuestaScreen>          
+          <Respuesta></Respuesta>          
         </>
       ) : (
         <Text>Cargando detalles...</Text>
@@ -77,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetallesInquietudScreen;
+export default Detalles;

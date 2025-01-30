@@ -18,6 +18,7 @@ export const login = async (correo, clave) => {
 
 export const logout = async () => {
   await AsyncStorage.removeItem('userToken');
+  await AsyncStorage.removeItem('personaId');
 };
 
 export const getToken = async () => {

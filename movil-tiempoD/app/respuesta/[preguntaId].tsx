@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getPersonaId } from "../constants/authService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const RespuestaScreen = () => {
+const Respuesta = () => {
     const { preguntaId } = useLocalSearchParams<{ preguntaId: string }>();
     const [respuesta, setRespuesta] = useState('');
     const [pregunta, setPregunta] = useState('');
@@ -47,7 +47,7 @@ const RespuestaScreen = () => {
 
             if (response.code === 201) {
                 Alert.alert("Comentario agregado", "Todo correcto", [
-                    { text: "Aceptar", onPress: () => router.push("/InquietudScreen") },
+                    { text: "Aceptar", onPress: () => router.push("/preguntas") },
                 ]);
             } else {
                 throw new Error("Error en la respuesta del servidor");
@@ -64,7 +64,7 @@ const RespuestaScreen = () => {
                 <Text style={styles.sectionTitle}>Responder Pregunta</Text>
                 <Button
                     title="Volver a Principal"
-                    onPress={() => router.push("/InquietudScreen")}
+                    onPress={() => router.push("/preguntas")}
                     color="#2563eb"
                 />
             </View>
@@ -210,4 +210,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RespuestaScreen;
+export default Respuesta;

@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { getPreguntas } from './utilities/Preguntas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const InquietudScreen = () => {
+const Preguntas = () => {
   const [preguntas, setPreguntas] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -21,7 +21,7 @@ const InquietudScreen = () => {
   }, []);
 
   const handleResponder = (preguntaId: string) => {    
-    router.push(`/RespuestaScreen/${preguntaId}`);
+    router.push(`/respuesta/${preguntaId}`);
   };
 
   // const handleDetalles = (preguntaId: string) => {
@@ -90,4 +90,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InquietudScreen;
+export default Preguntas;
