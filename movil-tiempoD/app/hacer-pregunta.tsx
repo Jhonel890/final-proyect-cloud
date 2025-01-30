@@ -95,7 +95,7 @@ const HacerPregunta = () => {
     useEffect(() => {
         const fetchPerfiles = async () => {
             try {
-                const response = await api.get("/perfil");
+                const response = await api.get("/qa/perfil");
                 
                 setPerfiles(response.data.data);
             } catch (error) {
@@ -125,9 +125,9 @@ const HacerPregunta = () => {
 
         setLoading(true);
         const personaId = await AsyncStorage.getItem("personaId");
-        
+
         try {
-            const response = await api.post("/inquietud", {
+            const response = await api.post("/qa/inquietud", {
                 titulo: title,
                 descripcion: description,
                 perfiles: selectedPerfiles,

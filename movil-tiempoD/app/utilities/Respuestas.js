@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const getRespuestas = async () => {
   try {
-    const response = await axios.get(`${API_URL}/respuesta/`);
+    const response = await axios.get(`${API_URL}/qa/respuesta/`);
     return response.data;
   } catch (error) {
     console.error("Error al obtener las respuestas:", error);
@@ -13,7 +13,7 @@ export const getRespuestas = async () => {
 
 export const getRespuesta = async (external_id) => {
   try {
-    const response = await axios.get(`${API_URL}/respuesta/${external_id}`);
+    const response = await axios.get(`${API_URL}/qa/respuesta/${external_id}`);
     return response.data;
   } catch (error) {
     console.error("Error al obtener la respuesta:", error);
@@ -23,7 +23,7 @@ export const getRespuesta = async (external_id) => {
 
 export const postRespuesta = async (respuestaData) => { 
   try {    
-    const response = await axios.post(`${API_URL}/respuesta/`, respuestaData);
+    const response = await axios.post(`${API_URL}/qa/respuesta/`, respuestaData);
     console.log(response);
     
     return response.data;
@@ -36,7 +36,7 @@ export const postRespuesta = async (respuestaData) => {
 export const putRespuesta = async (external_id, respuestaData) => {
   try {
     const response = await axios.put(
-      `${API_URL}/respuestas/${external_id}`,
+      `${API_URL}/qa/respuesta/${external_id}`,
       respuestaData
     );
     return response.data;
@@ -49,7 +49,7 @@ export const putRespuesta = async (external_id, respuestaData) => {
 export const getMisRespuestas = async (persona_id) => {
   try {
     const response = await axios.get(
-      `${API_URL}/respuestas/misRespuestas/${persona_id}`
+      `${API_URL}/qa/respuesta/misRespuestas/${persona_id}`
     );
     return response.data;
   } catch (error) {
